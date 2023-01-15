@@ -1,5 +1,10 @@
 html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: #f1f1f1;
 }
 
 * {
@@ -12,9 +17,15 @@ li {
     list-style: none;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+li.nav-item {
+    float: left;
+    padding: 20px;
+}
+
+.since-date {
+    position: fixed;
+    font-size: 24px;
+    right: 10px;
 }
 
 .navbar {
@@ -23,7 +34,119 @@ a {
     width: 100vw;
     height: 100px;
     padding: 0px;
-    background-color: rgb(	59, 107, 231);
+    background-color: rgb(59, 107, 231);
     border-radius: 0px 0px 24px 24px;
     padding-inline: 50px;
+}
+
+a {
+    text-decoration: none;
+}
+
+.navbar-name {
+    font-size: 64px;
+    color: white;
+}
+
+.navbar>.nav_options_icons>.nav-menu>.nav-item>.nav-link {
+    color: white;
+    font-size: 24px;
+}
+
+.navbar>.nav_options_icons>.nav-menu>.nav-item>.active {
+    color: white;
+    text-decoration-line: underline;
+    font-size: 24px;
+}
+
+.navbar>.nav_options_icons>.nav-menu>.nav-item> {
+    position: fixed;
+    left: 30px;
+    height: 10px;
+    padding: 0px;
+    background-color: rgb(59, 107, 231);
+    border-radius: 0px 0px 24px 24px;
+    padding-inline: 50px;
+}
+
+.accounts-wrapper {
+    font-size: 24px;
+    width: 80%;
+    background-color: white;
+}
+
+.account-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 16px;
+    border-bottom: 1px solid black;
+}
+
+.account-name-wrapper {
+    font-size: 24px;
+}
+
+.account-details-wrapper {
+    font-size: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.footer-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    background-color: white;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+    margin-block-start: 150px;
+}
+
+.content-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+}
+
+.background-wrapper {
+    height: 100vh;
+    width: 100vw;
+    background-color: #f1f1f1;
+}
+
+.greeting-field {
+    width: 100%;
+    background-color: #194ED7;
+    padding: 16px;
+    color: white;
+}
+
+.more-info > a {
+    color: black;
+}
+
+.more-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-wrapper > a {
+    color: black;
+    align-self: flex-end;
+    padding-inline-end: 24px;
+}
+
+.footer-wrapper > a:last-child {
+    padding-block-end: 12px;
 }
