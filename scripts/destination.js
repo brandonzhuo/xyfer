@@ -9,37 +9,53 @@ const destKey = "destination";
 const sourceKey = "source";
 
 nextButton.addEventListener("click", e => {
+
     const dest = inputElement.value;
+
     if (dest.match(addressPattern)) {
+
         let whitelistDb = JSON.parse(cache.getItem(whitelistKey));
         const currUserDetails = JSON.parse(cache.getItem(currentUserDetailKey)); 
-        const currUserAccs = currUserDetails["account_state"];
-        const currUserEthAcc = currUserAccs["acc2"];
-        const currUserEthAddr = currUserEthAcc["Account"];
+        const currUserEthAddr = currUserDetails.account_state.acc2.Account;
         let currUserSource = currUserAccs.acc1.Account;
+
         if (dest === currUserEthAddr) {
             alert("You cannot send to your own address!");
-        } else {
+        }
+
+        else {
+
             let shouldAlert = false;
+
             for (let user in whitelistDb) {
+
                 let curr = whitelistDb[user];
+
                 if (dest === curr) {
+
                     cache.setItem(destKey, dest);
                     cache.setItem(sourceKey, currUserSource);
                     shouldAlert = true;
                     window.location.href = "../pages/converter.html";
+
                 }
             }
+
             if (!shouldAlert) {
                 alert("Address is not whitelisted!");
             }
+
         }
-    } else {
-        const currUserDetails = JSON.parse(cache.getItem(currentUserDetailKey)); 
-        const currUserAccs = currUserDetails["account_state"];
-        const currUserEthAcc = currUserAccs["acc2"];
-        const currUserEthAddr = currUserEthAcc["Account"];
+
+    }
+
+    else {
+
+        const currUserDetails = JSON.parse(cache.getItem(currentUserDetailKey));
+        const currUserEthAddr = currUserDetails.account_state.acc2.Account;
         console.log(currUserEthAddr);
         alert("Invalid address!")
+
     }
+
 });

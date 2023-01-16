@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const port = 3000
+
 // We are using our packages here
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 
@@ -22,7 +23,8 @@ app.listen(port, ()=>{
 
 
 function generate() {
-    var ethers = require('ethers');  
+
+    var ethers = require('ethers');
     var crypto = require('crypto');
     
     var id = crypto.randomBytes(32).toString('hex');
@@ -30,4 +32,5 @@ function generate() {
     
     var wallet = new ethers.Wallet(privateKey);
     return wallet.address;
+
 }
