@@ -1,15 +1,23 @@
 
-const appId = 'IqmgcmlID2I3saQUEVaLNaTGRPcERbE2S88MIRYo';
 const forms = document.querySelectorAll(".form-select");
-let data;
 let toField = document.querySelector(".to-input");
 let fieldArr = document.querySelector(".from-input");
 let transferButton = document.querySelector(".transfer-button");
 const cache = window.localStorage;
-const currentUserDetailKey = "currentuserdetail";
+
+let data;
+let fromChosen = false;
+let toChosen = false;
+let fromValue;
+let toValue;
+let fromRate;
+let toRate;
+let sendAmount = 0;
+let finalValue = 0;
+
+const appId = 'IqmgcmlID2I3saQUEVaLNaTGRPcERbE2S88MIRYo';
 const currentUserKey = "currentuser";
 const destKey = "destination";
-const whitelistKey = "whitelisted";
 const amountKey = "amount";
 
 fetch(`https://api.currencyapi.com/v3/latest?apikey=${appId}`, {
@@ -36,10 +44,8 @@ fetch(`https://api.currencyapi.com/v3/latest?apikey=${appId}`, {
         forms.forEach(form => {
             if (turn) {
                 form.appendChild(opt1);
-            }
-
-            else {
-                form.appendChild(opt2);
+            } else {
+                form.appendChild(opt2); 
                 turn = true;
             }
 
@@ -48,15 +54,6 @@ fetch(`https://api.currencyapi.com/v3/latest?apikey=${appId}`, {
     }
 
 });
-
-let fromChosen = false;
-let toChosen = false;
-let fromValue;
-let toValue;
-let fromRate;
-let toRate;
-let sendAmount = 0;
-let finalValue = 0;
 
 forms.forEach(form => {
 
@@ -127,10 +124,8 @@ fieldArr.addEventListener("input", (event) => {
     let currInput = event.target.value;
 
     if (currInput.match("[0-9]")) {
-        sendAmount = currInput;
-    }
-
-    else {
+        sendAmount = parseFloat(currInput).toFixed(2);
+    } else {
         event.target.value = "";
     }
 
@@ -144,53 +139,74 @@ fieldArr.addEventListener("input", (event) => {
 });
 
 transferButton.addEventListener("click", e => {
+    let balance;
+    $.ajax({
+        method: 'POST',
+        async: false,
+        url: 'http://localhost:3000/initiate-dashboard',
+        data: { 
+            user_name: cache[currentUserKey],
+        },
+        success: function (data) {
+            $.ajax({
+                type: 'get',
+                async: false,
+                url: 'http://localhost:3000/retrieve-bank-details',
+                success: function (data) {
+                    balance = data.account_state.acc1.Balance;
+                    balance = balance.replace("$", "");
+                    balance = parseFloat(balance).toFixed(2);
+                    if (+sendAmount > +balance) {
+                        alert("Insufficient Funds!");
+                    } else {
+                        balance -= sendAmount;
+                        balance = "$" + balance;
+                        // Update current user balance
+                        $.ajax({
+                            method: 'POST',
+                            async: false,
+                            url: 'http://localhost:3000/update-balance',
+                            data: { 
+                                user_name: cache[currentUserKey],
+                                res_balance : balance,
+                            },
+                            success: function (data) {
+                                console.log(data);
+                            }
+                        });
 
-    const currUserDetails = JSON.parse(cache.getItem(currentUserDetailKey));
-    let balance = currUserDetails.account_state.acc1.Balance;
-    balance = balance.replace("$", "");
-    balance = parseFloat(balance).toFixed(2);
-
-    if (sendAmount > balance) {
-        alert("Insufficient Funds!");
-    }
-
-    else {
-
-        balance -= sendAmount;
-        currUserDetails.account_state.acc1.Balance = "$" + balance;
-        let currUser = cache.getItem(currentUserKey);
-        const userDetailsWrapper = JSON.parse(cache.getItem(currUser));
-        userDetailsWrapper.account_state.acc1.Balance = "$" + balance;
-
-        cache.setItem(currUser, JSON.stringify(userDetailsWrapper));
-        cache.setItem(currentUserDetailKey, JSON.stringify(currUserDetails));
-
-        let dest = cache.getItem(destKey);
-        let target;
-        let whitelistArr = JSON.parse(cache.getItem(whitelistKey));
-
-        for (let name in whitelistArr) {
-
-            if (whitelistArr[name] === dest) {
-
-                target = name;
-                break;
-
-            }
-
+                        // Update receiver balance
+                        $.ajax({
+                            method: 'POST',
+                            async: false,
+                            url: 'http://localhost:3000/update-receiver-balance',
+                            data: { 
+                                receiver : cache[destKey],
+                                rcvamt : finalValue
+                            },
+                            success: function (data) {
+                                console.log(data);
+                            }
+                        });
+                        // let target;
+                        // let whitelistArr = JSON.parse(cache.getItem(whitelistKey));
+                        // for (let name in whitelistArr) {
+                        //     if (whitelistArr[name] === dest) {
+                        //         target = name;
+                        //         break;
+                        //     }
+                        // }
+                        // let targetDetailsArr = JSON.parse(cache.getItem(target));
+                        // let receiverBalance = targetDetailsArr.account_state.acc1.Balance;
+                        // receiverBalance = receiverBalance.replace("$", "");
+                        // receiverBalance = (parseFloat(receiverBalance) + finalValue).toFixed(2);
+                        // targetDetailsArr.account_state.acc1.Balance = "$" + receiverBalance;
+                        // cache.setItem(target, JSON.stringify(targetDetailsArr));
+                        cache.setItem(amountKey, `$${sendAmount}`);
+                        window.location.href = "../pages/success.html";
+                    }
+                }
+            });
         }
-
-        let targetDetailsArr = JSON.parse(cache.getItem(target));
-        let receiverBalance = targetDetailsArr.account_state.acc1.Balance;
-
-        receiverBalance = receiverBalance.replace("$", "");
-        receiverBalance = (parseFloat(receiverBalance) + finalValue).toFixed(2);
-        targetDetailsArr.account_state.acc1.Balance = "$" + receiverBalance;
-        cache.setItem(target, JSON.stringify(targetDetailsArr));
-        cache.setItem(amountKey, `$${sendAmount}`);
-
-        window.location.href = "../pages/success.html";
-
-    }
-
+    });
 });
